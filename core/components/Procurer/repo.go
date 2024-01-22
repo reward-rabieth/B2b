@@ -7,10 +7,10 @@ import (
 )
 
 type Repo interface {
-	Create(requisition *models.Requisition, ctx context.Context) error
+	Create(ctx context.Context, requisition *models.Requisition) (*models.Requisition, error)
 	GetByID(id int) (*models.Requisition, error)
-	Update(requisition *models.Requisition) error
-	Delete(id int) error
+	Update(ctx context.Context, requisition *models.Requisition) error
+	Delete(ctx context.Context, id int) error
 }
 
 type repo struct {
@@ -32,10 +32,10 @@ func (r *repo) GetByID(id int) (*models.Requisition, error) {
 	return nil, nil
 }
 
-func (r *repo) Update(ctx context.Context, requisition models.Requisition) error {
+func (r *repo) Update(ctx context.Context, requisition *models.Requisition) error {
 	return nil
 }
 
-func (r *repo) Delete() error {
+func (r *repo) Delete(ctx context.Context, id int) error {
 	return nil
 }
