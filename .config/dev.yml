@@ -1,0 +1,8 @@
+port: 7979
+db-name: B2B
+db-args: "sslmode=disable"
+db-user: root
+db-password: root
+postgres-addr: localhost:5432
+migration-url:  file://db/migration
+supabase:
