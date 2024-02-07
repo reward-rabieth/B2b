@@ -20,7 +20,7 @@ func startHttpServer() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	apiAddress := fmt.Sprintf("0.0.0.0", viper.GetString("port"))
+	apiAddress := fmt.Sprintf("0.0.0.0:%s", viper.GetString("port"))
 	server := &http.Server{
 		Addr:    apiAddress,
 		Handler: app.NewHandler(),

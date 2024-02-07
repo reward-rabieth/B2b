@@ -1,35 +1,40 @@
 package db
 
 import (
+	"context"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/reward-rabieth/b2b/config"
-	procurerModels "github.com/reward-rabieth/b2b/core/components/Procurer/models"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"log"
 	"log/slog"
-	"time"
 )
 
-var registeredModels = []interface{}{
-	&procurerModels.Requisition{},
-}
-
 // Connect  establishes a connection to the database using the provided configuration
-func Connect(logger *slog.Logger, cfg config.DatabaseConfig) (*gorm.DB, error) {
+func Connect(logger *slog.Logger, cfg config.DatabaseConfig) (*pgxpool.Pool, error) {
+	ctx := context.Background()
 
-	db, err := gorm.Open(postgres.Open(cfg.URL()), &gorm.Config{
-		NowFunc: func() time.Time {
-			return time.Now().UTC()
-		},
-		PrepareStmt: true,
-	})
+	connPool, err := pgxpool.New(ctx, cfg.URL())
 	if err != nil {
 		return nil, err
 	}
 
-	logger.Info("Connected to postgres on address" + cfg.URL())
+	logger.Info("connected to postgres on address\n" + cfg.URL())
 
-	if err := db.AutoMigrate(registeredModels...); err != nil {
-		return nil, err
+	runDBMigration("file://db/migration", cfg.URL())
+	return connPool, nil
+}
+
+func runDBMigration(migrationURL string, Url string) {
+	m, err := migrate.New("file://db/migration", Url)
+	if err != nil {
+		log.Fatalln(err)
 	}
-	return db, nil
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatalln(err)
+	}
+
+	slog.Info("db migrated successfully")
 }

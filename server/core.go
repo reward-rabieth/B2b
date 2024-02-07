@@ -1,29 +1,26 @@
 package server
 
 import (
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/reward-rabieth/b2b/config"
-	"github.com/reward-rabieth/b2b/core/components/Procurer"
 	"github.com/reward-rabieth/b2b/db"
-	"gorm.io/gorm"
+	users "github.com/reward-rabieth/b2b/db/sqlc"
 	"log/slog"
 )
 
 type App struct {
-	DB                *gorm.DB
+	DB                *pgxpool.Pool
 	shutdownCallbacks []func()
 
 	//logger
 	logger *slog.Logger
 
 	//db repositories
-	ProcurerRepo Procurer.Repo
-
-	//component handler
-	procurerComponent Procurer.Component
+	repos users.Store
 }
 
-func NewApp() (app *App, err error) {
-	app = &App{}
+func NewApp() (app App, err error) {
+	app = App{}
 	app.logger = slog.Default()
 	if app.DB, err = db.Connect(app.logger, config.GetDatabaseConfig()); err != nil {
 		return
@@ -32,7 +29,7 @@ func NewApp() (app *App, err error) {
 	app.shutdownCallbacks = []func(){}
 
 	//repositories initialization
-	if app.ProcurerRepo, err = Procurer.NewRepo(app.DB); err != nil {
+	if app.repos = users.NewStore(app.DB); err != nil {
 		return app, err
 	}
 	return app, nil

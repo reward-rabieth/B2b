@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"log/slog"
 	"os"
@@ -11,7 +12,21 @@ import (
 	"time"
 )
 
+const (
+	localConfigName = "dev"
+)
+
+func setupAllFlags() {
+	pflag.String("config-name", localConfigName, "name of the config file")
+}
+
 func ConfigureViperSettings() error {
+	setupAllFlags()
+
+	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
+		slog.Error("could not bind viper flags")
+		return err
+	}
 	//map environmental variable  to viper config
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()

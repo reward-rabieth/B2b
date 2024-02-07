@@ -2,15 +2,14 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"net/http"
 )
 
 func (app *App) NewHandler() http.Handler {
-	r := mux.NewRouter()
+	r := http.NewServeMux()
 
-	r.HandleFunc("/api/procurement", app.CreateRequisition).Methods(http.MethodPost)
+	r.HandleFunc("POST /api/procurement", app.CreateRequisition)
 	corsHandler := cors.AllowAll()
 	return corsHandler.Handler(r)
 }
