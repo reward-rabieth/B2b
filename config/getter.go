@@ -17,6 +17,6 @@ func GetDatabaseConfig() DatabaseConfig {
 func GetSupabaseConfig() SupabaseConfig {
 	return SupabaseConfig{
 		BaseURL: viper.GetString("supabase.base-url"),
-		ApiKey:  viper.GetString("supavase.api-key"),
+		ApiKey:  viper.GetString("supabase.api-key"),
 	}
 }

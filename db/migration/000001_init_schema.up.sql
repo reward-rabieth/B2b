@@ -8,21 +8,28 @@ CREATE TYPE UserTypeENUM AS ENUM (
 
 
 CREATE TABLE "UserTypes" (
-                             "UserTypePK" integer,
-                             "UserType" UserTypeENUM
+                             "UserTypePK" integer not null ,
+                             "UserType" UserTypeENUM not null
 );
+
+INSERT INTO "UserTypes" ("UserTypePK", "UserType") VALUES
+                                                       (1, 'procurer'),
+                                                       (2, 'approver'),
+                                                       (3, 'supplier');
+
+
 
 
 
 
 CREATE TABLE "users" (
-                         "userid"  integer not null ,
+                         "userid"  varchar not null ,
                          "username" varchar not null ,
                          "password" varchar not null ,
                          "email" varchar not null ,
                          "usertypefk" integer not null,
-                        "created_at" timestamptz not null ,
-                        "updated_at" timestamptz not null
+                        "created_at" timestamptz not null default (now()),
+                        "updated_at" timestamptz not null  default (now())
 
 
 );

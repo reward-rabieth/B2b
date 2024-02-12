@@ -76,7 +76,7 @@ type QuotationRequest struct {
 }
 
 type User struct {
-	Userid     int32              `json:"userid"`
+	Userid     string             `json:"userid"`
 	Username   string             `json:"username"`
 	Password   string             `json:"password"`
 	Email      string             `json:"email"`
@@ -86,8 +86,8 @@ type User struct {
 }
 
 type UserType struct {
-	UserTypePK pgtype.Int4      `json:"UserTypePK"`
-	UserType   NullUsertypeenum `json:"UserType"`
+	UserTypePK int32        `json:"UserTypePK"`
+	UserType   Usertypeenum `json:"UserType"`
 }
 
 type Vendor struct {

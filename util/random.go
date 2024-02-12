@@ -2,6 +2,8 @@ package util
 
 import (
 	"github.com/google/uuid"
+	"github.com/nedpals/supabase-go"
+	users "github.com/reward-rabieth/b2b/db/sqlc"
 	"math/rand"
 	"time"
 )
@@ -12,4 +14,12 @@ func init() {
 
 func GenerateUUID() string {
 	return uuid.New().String()
+}
+
+func MapSupabaseUserToParams(user supabase.UserCredentials) users.CreateUserParams {
+	return users.CreateUserParams{
+
+		Password: user.Password,
+		Email:    user.Email,
+	}
 }

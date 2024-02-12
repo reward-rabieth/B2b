@@ -10,10 +10,14 @@ import (
 
 type Querier interface {
 	CreatePurchaseRequisition(ctx context.Context, arg CreatePurchaseRequisitionParams) (Purchaserequisition, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeletePurchaseRequisition(ctx context.Context, requisitionid string) error
-	DeleteUsers(ctx context.Context, userid int32) error
+	DeleteUsers(ctx context.Context, userid string) error
 	GetPurchaseRequisition(ctx context.Context, requisitionid string) (Purchaserequisition, error)
-	GetUserByID(ctx context.Context, userid int32) (User, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserByID(ctx context.Context, userid string) (User, error)
+	GetUserTypeByID(ctx context.Context, usertypepk int32) (Usertypeenum, error)
+	GetUserTypes(ctx context.Context) ([]UserType, error)
 	ListPurchaseRequisitions(ctx context.Context) ([]Purchaserequisition, error)
 	ListUsers(ctx context.Context) ([]User, error)
 	UpdatePurchaseRequisition(ctx context.Context, arg UpdatePurchaseRequisitionParams) error

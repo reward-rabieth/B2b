@@ -9,7 +9,9 @@ import (
 func (app *App) NewHandler() http.Handler {
 	r := http.NewServeMux()
 
-	r.HandleFunc("POST /api/procurement", app.CreateRequisition)
+	r.HandleFunc("POST /api/procurement", app.AuthMiddleware(app.CreateRequisition))
+	r.HandleFunc("POST /register", app.Register)
+	r.HandleFunc("POST /login", app.Login)
 	corsHandler := cors.AllowAll()
 	return corsHandler.Handler(r)
 }
