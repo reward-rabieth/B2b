@@ -7,93 +7,91 @@ package users
 import (
 	"database/sql/driver"
 	"fmt"
+	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
-type Usertypeenum string
+type UserTypeEnum string
 
 const (
-	UsertypeenumProcurer Usertypeenum = "procurer"
-	UsertypeenumApprover Usertypeenum = "approver"
-	UsertypeenumSupplier Usertypeenum = "supplier"
+	UserTypeEnumProcurer UserTypeEnum = "procurer"
+	UserTypeEnumApprover UserTypeEnum = "approver"
+	UserTypeEnumSupplier UserTypeEnum = "supplier"
 )
 
-func (e *Usertypeenum) Scan(src interface{}) error {
+func (e *UserTypeEnum) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = Usertypeenum(s)
+		*e = UserTypeEnum(s)
 	case string:
-		*e = Usertypeenum(s)
+		*e = UserTypeEnum(s)
 	default:
-		return fmt.Errorf("unsupported scan type for Usertypeenum: %T", src)
+		return fmt.Errorf("unsupported scan type for UserTypeEnum: %T", src)
 	}
 	return nil
 }
 
-type NullUsertypeenum struct {
-	Usertypeenum Usertypeenum `json:"usertypeenum"`
-	Valid        bool         `json:"valid"` // Valid is true if Usertypeenum is not NULL
+type NullUserTypeEnum struct {
+	UserTypeEnum UserTypeEnum `json:"user_type_enum"`
+	Valid        bool         `json:"valid"` // Valid is true if UserTypeEnum is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullUsertypeenum) Scan(value interface{}) error {
+func (ns *NullUserTypeEnum) Scan(value interface{}) error {
 	if value == nil {
-		ns.Usertypeenum, ns.Valid = "", false
+		ns.UserTypeEnum, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.Usertypeenum.Scan(value)
+	return ns.UserTypeEnum.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullUsertypeenum) Value() (driver.Value, error) {
+func (ns NullUserTypeEnum) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.Usertypeenum), nil
+	return string(ns.UserTypeEnum), nil
 }
 
-type Purchaserequisition struct {
-	Requisitionid string             `json:"requisitionid"`
-	Requesterid   string             `json:"requesterid"`
-	Title         string             `json:"title"`
-	Description   string             `json:"description"`
-	Status        string             `json:"status"`
-	Datesubmitted pgtype.Timestamptz `json:"datesubmitted"`
-	Dateapproved  pgtype.Timestamptz `json:"dateapproved"`
-	Daterejected  pgtype.Timestamptz `json:"daterejected"`
+type BusinessParticular struct {
+	RegBusinessName    string `json:"reg_business_name"`
+	BrelaRegNumber     string `json:"brela_reg_number"`
+	UserID             int32  `json:"user_id"`
+	PoBox              string `json:"po_box"`
+	OccupationLocation string `json:"occupation_location"`
+	Country            string `json:"country"`
+	Region             string `json:"region"`
+	Tin                string `json:"tin"`
+	FirstName          string `json:"first_name"`
+	LastName           string `json:"last_name"`
+	Contact            string `json:"contact"`
+	Website            string `json:"website"`
 }
 
-type QuotationRequest struct {
-	ProposalRequestID pgtype.Int4        `json:"ProposalRequestID"`
-	RequisitionID     pgtype.Text        `json:"RequisitionID"`
-	VendorID          pgtype.Int4        `json:"VendorID"`
-	Status            pgtype.Text        `json:"Status"`
-	DateSubmitted     pgtype.Timestamptz `json:"DateSubmitted"`
-	DateApproved      pgtype.Timestamptz `json:"DateApproved"`
-	DateRejected      pgtype.Timestamptz `json:"DateRejected"`
+type PurchaseRequisition struct {
+	RequisitionID uuid.UUID `json:"requisition_id"`
+	RequesterID   string    `json:"requester_id"`
+	Description   string    `json:"description"`
+	Title         string    `json:"title"`
+	Status        string    `json:"status"`
+	DateSubmitted time.Time `json:"date_submitted"`
+	DateApproved  time.Time `json:"date_approved"`
+	DateRejected  time.Time `json:"date_rejected"`
 }
 
 type User struct {
-	Userid     string             `json:"userid"`
-	Username   string             `json:"username"`
-	Password   string             `json:"password"`
-	Email      string             `json:"email"`
-	Usertypefk int32              `json:"usertypefk"`
-	CreatedAt  pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+	UserID     string    `json:"user_id"`
+	Username   string    `json:"username"`
+	Password   string    `json:"password"`
+	Email      string    `json:"email"`
+	UserTypefk int32     `json:"user_typefk"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 type UserType struct {
-	UserTypePK int32        `json:"UserTypePK"`
-	UserType   Usertypeenum `json:"UserType"`
-}
-
-type Vendor struct {
-	VendorID      pgtype.Int4 `json:"VendorID"`
-	VendorName    pgtype.Text `json:"VendorName"`
-	ContactPerson pgtype.Text `json:"ContactPerson"`
-	ContactEmail  pgtype.Text `json:"ContactEmail"`
-	VendorType    pgtype.Text `json:"VendorType"`
+	UserTypePk int32            `json:"user_type_pk"`
+	UserType   NullUserTypeEnum `json:"user_type"`
 }

@@ -1,0 +1,12 @@
+port: 7979
+db-name: B2B
+db-args: "sslmode=disable"
+db-user: root
+db-password: root
+postgres-addr: localhost:5432
+migration-url:  file://db/migration
+db-source: postgres://root:root@localhost:5432/B2B?sslmode=disable
+germini_key: AIzaSyCPEeI0ot7MMLVicG3ufurb5Br8DZZs5Gs
+supabase:
+  api-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXl3YnNrcnJmZ2ZhYWxwdWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc0ODEwMTYsImV4cCI6MjAyMzA1NzAxNn0.tApqDDBUxlfU3sWuQfLKoVibd-YUKXOWoXLjzOPxZg0
+  base-url: https://bhmywbskrrfgfaalpufw.supabase.co

@@ -6,20 +6,24 @@ package users
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
-	CreatePurchaseRequisition(ctx context.Context, arg CreatePurchaseRequisitionParams) (Purchaserequisition, error)
+	CreateBusinessParticular(ctx context.Context, arg CreateBusinessParticularParams) (BusinessParticular, error)
+	CreatePurchaseRequisition(ctx context.Context, arg CreatePurchaseRequisitionParams) (PurchaseRequisition, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	DeletePurchaseRequisition(ctx context.Context, requisitionid string) error
-	DeleteUsers(ctx context.Context, userid string) error
-	GetPurchaseRequisition(ctx context.Context, requisitionid string) (Purchaserequisition, error)
+	DeletePurchaseRequisition(ctx context.Context, requisitionID uuid.UUID) error
+	DeleteUsers(ctx context.Context, userID string) error
+	GetPurchaseRequisition(ctx context.Context, requisitionID uuid.UUID) (PurchaseRequisition, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
-	GetUserByID(ctx context.Context, userid string) (User, error)
-	GetUserTypeByID(ctx context.Context, usertypepk int32) (Usertypeenum, error)
+	GetUserByID(ctx context.Context, userID string) (User, error)
+	GetUserTypeByID(ctx context.Context, userTypePk int32) (NullUserTypeEnum, error)
 	GetUserTypes(ctx context.Context) ([]UserType, error)
-	ListPurchaseRequisitions(ctx context.Context) ([]Purchaserequisition, error)
+	ListPurchaseRequisitions(ctx context.Context) ([]PurchaseRequisition, error)
 	ListUsers(ctx context.Context) ([]User, error)
+	UpdateBusinessParticulars(ctx context.Context, arg UpdateBusinessParticularsParams) error
 	UpdatePurchaseRequisition(ctx context.Context, arg UpdatePurchaseRequisitionParams) error
 	UpdateUsers(ctx context.Context, arg UpdateUsersParams) error
 }

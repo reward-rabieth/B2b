@@ -1,0 +1,20 @@
+version: "2.4"
+services:
+  postgres:
+    image: postgres:16.2-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=B2B
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7979:7979"
+    environment:
+      - db-source=postgres://root:root@postgres:5432/B2B?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_completed_successfully
+

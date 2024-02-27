@@ -7,103 +7,107 @@ package users
 
 import (
 	"context"
+	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createPurchaseRequisition = `-- name: CreatePurchaseRequisition :one
-INSERT INTO purchaserequisitions (
-    requisitionid, requesterid,title, description,status
-) VALUES (
-             $1, $2,$3,$4,$5
-         )
-    RETURNING requisitionid, requesterid, title, description, status, datesubmitted, dateapproved, daterejected
+INSERT INTO purchase_requisitions (
+    requisition_id,
+    requester_id,
+    description,
+    title,
+    status
+
+) VALUES ($1, $2, $3, $4 ,$5
+         ) RETURNING requisition_id, requester_id, description, title, status, date_submitted, date_approved, date_rejected
 `
 
 type CreatePurchaseRequisitionParams struct {
-	Requisitionid string `json:"requisitionid"`
-	Requesterid   string `json:"requesterid"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Status        string `json:"status"`
+	RequisitionID uuid.UUID `json:"requisition_id"`
+	RequesterID   string    `json:"requester_id"`
+	Description   string    `json:"description"`
+	Title         string    `json:"title"`
+	Status        string    `json:"status"`
 }
 
-func (q *Queries) CreatePurchaseRequisition(ctx context.Context, arg CreatePurchaseRequisitionParams) (Purchaserequisition, error) {
+func (q *Queries) CreatePurchaseRequisition(ctx context.Context, arg CreatePurchaseRequisitionParams) (PurchaseRequisition, error) {
 	row := q.db.QueryRow(ctx, createPurchaseRequisition,
-		arg.Requisitionid,
-		arg.Requesterid,
-		arg.Title,
+		arg.RequisitionID,
+		arg.RequesterID,
 		arg.Description,
+		arg.Title,
 		arg.Status,
 	)
-	var i Purchaserequisition
+	var i PurchaseRequisition
 	err := row.Scan(
-		&i.Requisitionid,
-		&i.Requesterid,
-		&i.Title,
+		&i.RequisitionID,
+		&i.RequesterID,
 		&i.Description,
+		&i.Title,
 		&i.Status,
-		&i.Datesubmitted,
-		&i.Dateapproved,
-		&i.Daterejected,
+		&i.DateSubmitted,
+		&i.DateApproved,
+		&i.DateRejected,
 	)
 	return i, err
 }
 
 const deletePurchaseRequisition = `-- name: DeletePurchaseRequisition :exec
-DELETE FROM purchaserequisitions
-WHERE requisitionid = $1
+DELETE FROM purchase_requisitions
+WHERE requisition_id = $1
 `
 
-func (q *Queries) DeletePurchaseRequisition(ctx context.Context, requisitionid string) error {
-	_, err := q.db.Exec(ctx, deletePurchaseRequisition, requisitionid)
+func (q *Queries) DeletePurchaseRequisition(ctx context.Context, requisitionID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deletePurchaseRequisition, requisitionID)
 	return err
 }
 
 const getPurchaseRequisition = `-- name: GetPurchaseRequisition :one
-SELECT requisitionid, requesterid, title, description, status, datesubmitted, dateapproved, daterejected FROM purchaserequisitions
-WHERE requisitionid = $1 LIMIT 1
+SELECT requisition_id, requester_id, description, title, status, date_submitted, date_approved, date_rejected FROM purchase_requisitions
+WHERE requisition_id = $1 LIMIT 1
 `
 
-func (q *Queries) GetPurchaseRequisition(ctx context.Context, requisitionid string) (Purchaserequisition, error) {
-	row := q.db.QueryRow(ctx, getPurchaseRequisition, requisitionid)
-	var i Purchaserequisition
+func (q *Queries) GetPurchaseRequisition(ctx context.Context, requisitionID uuid.UUID) (PurchaseRequisition, error) {
+	row := q.db.QueryRow(ctx, getPurchaseRequisition, requisitionID)
+	var i PurchaseRequisition
 	err := row.Scan(
-		&i.Requisitionid,
-		&i.Requesterid,
-		&i.Title,
+		&i.RequisitionID,
+		&i.RequesterID,
 		&i.Description,
+		&i.Title,
 		&i.Status,
-		&i.Datesubmitted,
-		&i.Dateapproved,
-		&i.Daterejected,
+		&i.DateSubmitted,
+		&i.DateApproved,
+		&i.DateRejected,
 	)
 	return i, err
 }
 
 const listPurchaseRequisitions = `-- name: ListPurchaseRequisitions :many
-SELECT requisitionid, requesterid, title, description, status, datesubmitted, dateapproved, daterejected FROM purchaserequisitions
-ORDER BY datesubmitted
+SELECT requisition_id, requester_id, description, title, status, date_submitted, date_approved, date_rejected FROM purchase_requisitions
+ORDER BY date_submitted
 `
 
-func (q *Queries) ListPurchaseRequisitions(ctx context.Context) ([]Purchaserequisition, error) {
+func (q *Queries) ListPurchaseRequisitions(ctx context.Context) ([]PurchaseRequisition, error) {
 	rows, err := q.db.Query(ctx, listPurchaseRequisitions)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Purchaserequisition{}
+	items := []PurchaseRequisition{}
 	for rows.Next() {
-		var i Purchaserequisition
+		var i PurchaseRequisition
 		if err := rows.Scan(
-			&i.Requisitionid,
-			&i.Requesterid,
-			&i.Title,
+			&i.RequisitionID,
+			&i.RequesterID,
 			&i.Description,
+			&i.Title,
 			&i.Status,
-			&i.Datesubmitted,
-			&i.Dateapproved,
-			&i.Daterejected,
+			&i.DateSubmitted,
+			&i.DateApproved,
+			&i.DateRejected,
 		); err != nil {
 			return nil, err
 		}
@@ -116,36 +120,36 @@ func (q *Queries) ListPurchaseRequisitions(ctx context.Context) ([]Purchaserequi
 }
 
 const updatePurchaseRequisition = `-- name: UpdatePurchaseRequisition :exec
-UPDATE purchaserequisitions
-set requesterid = $2,
+UPDATE purchase_requisitions
+set requester_id = $2,
     description = $3,
     status= $4,
-    datesubmitted=$5,
-    dateapproved=$6,
-    daterejected=$7
+    date_submitted=$5,
+    date_approved=$6,
+    date_rejected=$7
 
-WHERE requisitionid = $1
+WHERE requisition_id = $1
 `
 
 type UpdatePurchaseRequisitionParams struct {
-	Requisitionid string             `json:"requisitionid"`
-	Requesterid   string             `json:"requesterid"`
-	Description   string             `json:"description"`
-	Status        string             `json:"status"`
-	Datesubmitted pgtype.Timestamptz `json:"datesubmitted"`
-	Dateapproved  pgtype.Timestamptz `json:"dateapproved"`
-	Daterejected  pgtype.Timestamptz `json:"daterejected"`
+	RequisitionID uuid.UUID `json:"requisition_id"`
+	RequesterID   string    `json:"requester_id"`
+	Description   string    `json:"description"`
+	Status        string    `json:"status"`
+	DateSubmitted time.Time `json:"date_submitted"`
+	DateApproved  time.Time `json:"date_approved"`
+	DateRejected  time.Time `json:"date_rejected"`
 }
 
 func (q *Queries) UpdatePurchaseRequisition(ctx context.Context, arg UpdatePurchaseRequisitionParams) error {
 	_, err := q.db.Exec(ctx, updatePurchaseRequisition,
-		arg.Requisitionid,
-		arg.Requesterid,
+		arg.RequisitionID,
+		arg.RequesterID,
 		arg.Description,
 		arg.Status,
-		arg.Datesubmitted,
-		arg.Dateapproved,
-		arg.Daterejected,
+		arg.DateSubmitted,
+		arg.DateApproved,
+		arg.DateRejected,
 	)
 	return err
 }
