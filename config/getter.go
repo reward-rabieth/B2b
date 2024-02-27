@@ -9,7 +9,8 @@ func GetDatabaseConfig() DatabaseConfig {
 		User:         viper.GetString("db-user"),
 		Password:     viper.GetString("db-password"),
 		DbArgs:       viper.GetString("db-args"),
-		MigrationURl: viper.GetString("migration-url:"),
+		MigrationURl: viper.GetString("migration-url"),
+		dbSource:     viper.GetString("db-source"),
 	}
 
 }
