@@ -1,31 +1,36 @@
 -- name: CreatePurchaseRequisition :one
-INSERT INTO purchaserequisitions (
-    requisitionid, requesterid,title, description,status
-) VALUES (
-             $1, $2,$3,$4,$5
-         )
-    RETURNING *;
+INSERT INTO purchase_requisitions (
+    requisition_id,
+    requester_id,
+    description,
+    title,
+    status
+
+) VALUES ($1, $2, $3, $4 ,$5
+         ) RETURNING *;
 
 -- name: GetPurchaseRequisition :one
-SELECT * FROM purchaserequisitions
-WHERE requisitionid = $1 LIMIT 1;
+SELECT * FROM purchase_requisitions
+WHERE requisition_id = $1 LIMIT 1;
 
 -- name: ListPurchaseRequisitions :many
-SELECT * FROM purchaserequisitions
-ORDER BY datesubmitted;
+SELECT * FROM purchase_requisitions
+ORDER BY date_submitted;
 
 
 -- name: UpdatePurchaseRequisition :exec
-UPDATE purchaserequisitions
-set requesterid = $2,
+UPDATE purchase_requisitions
+set requester_id = $2,
     description = $3,
     status= $4,
-    datesubmitted=$5,
-    dateapproved=$6,
-    daterejected=$7
+    date_submitted=$5,
+    date_approved=$6,
+    date_rejected=$7
 
-WHERE requisitionid = $1;
+WHERE requisition_id = $1;
 
 -- name: DeletePurchaseRequisition :exec
-DELETE FROM purchaserequisitions
-WHERE requisitionid = $1;
+DELETE FROM purchase_requisitions
+WHERE requisition_id = $1;
+
+

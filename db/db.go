@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -17,23 +18,23 @@ func Connect(logger *slog.Logger, cfg config.DatabaseConfig) (*pgxpool.Pool, err
 
 	connPool, err := pgxpool.New(ctx, cfg.URL())
 	if err != nil {
-		return nil, err
+		logger.Error("cannot connect to db", err)
 	}
 
 	logger.Info("connected to postgres on address\n" + cfg.URL())
 
-	runDBMigration("file://db/migration", cfg.URL())
+	runDBMigration(cfg.MigrationURl, cfg.URL())
 	return connPool, nil
 }
 
-func runDBMigration(migrationURL string, Url string) {
-	m, err := migrate.New("file://db/migration", Url)
+func runDBMigration(migrationURL string, dbSource string) {
+	m, err := migrate.New(migrationURL, dbSource)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("cannot create new migration instance %v", err)
 	}
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatalln(err)
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		log.Fatalf("failed to run migrate up %v", err)
 	}
 
 	slog.Info("db migrated successfully")

@@ -12,6 +12,7 @@ func (app *App) NewHandler() http.Handler {
 	r.HandleFunc("POST /api/procurement", app.AuthMiddleware(app.CreateRequisition))
 	r.HandleFunc("POST /register", app.Register)
 	r.HandleFunc("POST /login", app.Login)
+	r.HandleFunc("POST /api/business", app.AddBusinessParticulars)
 	corsHandler := cors.AllowAll()
 	return corsHandler.Handler(r)
 }

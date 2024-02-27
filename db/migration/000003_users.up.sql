@@ -1,9 +1,9 @@
 
 CREATE TABLE "users" (
                          "user_id" varchar PRIMARY KEY not null ,
-                         "username" varchar(50) not null ,
-                         "password" varchar(50) not null ,
-                         "email" varchar(50) not null ,
+                         "username" varchar(255) not null ,
+                         "password" varchar(255) not null ,
+                         "email" varchar(255) not null ,
                          "user_typefk" integer not null ,
                          "created_at" timestamptz NOT NULL DEFAULT NOW(),
                          "updated_at" timestamptz not null default (now())

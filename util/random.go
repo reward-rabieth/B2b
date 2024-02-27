@@ -12,8 +12,8 @@ func init() {
 	rand.NewSource(time.Now().UnixNano())
 }
 
-func GenerateUUID() string {
-	return uuid.New().String()
+func GenerateUUID() uuid.UUID {
+	return uuid.New()
 }
 
 func MapSupabaseUserToParams(user supabase.UserCredentials) users.CreateUserParams {

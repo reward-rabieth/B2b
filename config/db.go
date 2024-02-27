@@ -1,7 +1,5 @@
 package config
 
-import "fmt"
-
 // DatabaseConfig holds configuration data.
 type DatabaseConfig struct {
 	Address      string
@@ -10,8 +8,10 @@ type DatabaseConfig struct {
 	Password     string
 	DbArgs       string
 	MigrationURl string
+	dbSource     string
 }
 
 func (cfg *DatabaseConfig) URL() string {
-	return fmt.Sprintf("postgres://%s:%s@%s?dbname=%s&%s", cfg.User, cfg.Password, cfg.Address, cfg.DbName, cfg.DbArgs)
+	//return fmt.Sprintf("postgres://%s:%s@%s?dbname=%s&%s", cfg.User, cfg.Password, cfg.Address, cfg.DbName, cfg.DbArgs)
+	return cfg.dbSource
 }

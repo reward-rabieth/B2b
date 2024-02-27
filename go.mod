@@ -9,7 +9,6 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/jackc/pgx/v5 v5.5.2
 	github.com/nedpals/supabase-go v0.4.0
-	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.10.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.18.2
@@ -20,6 +19,7 @@ require (
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
