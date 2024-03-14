@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/google/uuid"
 	users "github.com/reward-rabieth/b2b/db/sqlc"
 	"github.com/reward-rabieth/b2b/util"
 	"net/http"
@@ -15,7 +16,11 @@ type RequisitionRequest struct {
 	Description   string `json:"description"`
 	RequesterId   string `json:"requester_id"`
 	RequisitionId string `json:"requisition_id"`
-	Status        string `json:"status"`
+	//Status        string `json:"status"`
+}
+
+type RequisitionRequestUpdate struct {
+	Status string `json:"status"`
 }
 
 type CreateBusinessParticularsRequest struct {
@@ -64,31 +69,32 @@ func (app *App) CreateRequisition(w http.ResponseWriter, r *http.Request) {
 		app.HandleAPIError(fmt.Errorf("failed to decode body: %w", err), http.StatusInternalServerError, w)
 		return
 	}
-	status := "submitted"
+
+	user, err := app.repos.ListUsers(r.Context())
+	reqID := util.GenerateUUID()
+
+	if err != nil {
+		fmt.Printf("error in fetching user %s", err)
+	}
 	arg := users.CreatePurchaseRequisitionParams{
-		RequisitionID: util.GenerateUUID(),
-		RequesterID:   util.GenerateUUID().String(),
+		RequisitionID: reqID,
+		RequesterID:   user[0].Username,
 		Title:         reqBody.Title,
 		Description:   reqBody.Description,
-		Status:        status,
 	}
-
+	fmt.Println(arg)
 	if err := reqBody.Validate(); err != nil {
 		fmt.Println(err)
 		app.HandleAPIError(err, http.StatusBadRequest, w)
 		return
 	}
-
 	requisition, err := app.repos.CreatePurchaseRequisition(context.Background(), arg)
+
 	if err != nil {
 		app.HandleAPIError(fmt.Errorf("failed to create requisition: %w", err), http.StatusInternalServerError, w)
 		return
 	}
 	app.logger.Info("Requisition created:", "requisitionId", "requesterid", requisition.RequesterID, "Description", requisition.Description, "Status", requisition.Status, "Title", requisition.Title, "requisitionID")
-	if err != nil {
-		app.HandleAPIError(fmt.Errorf("failed to create requisition: %w", err), http.StatusInternalServerError, w)
-		return
-	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(requisition); err != nil {
@@ -137,6 +143,48 @@ func (app *App) AddBusinessParticulars(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(newParticular); err != nil {
 		app.HandleAPIError(fmt.Errorf("failed to encode response:%w", err), http.StatusInternalServerError, w)
+	}
+
+}
+
+func (app *App) UpdatePurchaseRequisitionByID(w http.ResponseWriter, r *http.Request) {
+
+	var reqBody RequisitionRequestUpdate
+	err := json.NewDecoder(r.Body).Decode(&reqBody)
+	if err != nil {
+		app.HandleAPIError(fmt.Errorf("failed to decode body %w", err), http.StatusInternalServerError, w)
+	}
+
+	reqID, err := uuid.Parse(r.PathValue("reqID"))
+	fmt.Println(reqID)
+	if err != nil {
+		app.HandleAPIError(fmt.Errorf("failed to parse request ID: %w", err), http.StatusBadRequest, w)
+		return
+	}
+	arg := users.UpdatePurchaseRequisitionParams{
+		Status:        reqBody.Status,
+		RequisitionID: reqID,
+	}
+	purchases, err := app.repos.GetPurchaseRequisitionByID(r.Context(), arg.RequisitionID)
+
+	if err != nil {
+
+		app.HandleAPIError(fmt.Errorf("failed to get requisition %w", err), http.StatusInternalServerError, w)
+
+	}
+	err = app.repos.UpdatePurchaseRequisition(r.Context(), arg)
+
+	if err != nil {
+		app.HandleAPIError(fmt.Errorf("failed to update requisition %w", err), http.StatusInternalServerError, w)
+		return
+	}
+
+	purchases.Status = arg.Status
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(purchases); err != nil {
+		app.HandleAPIError(fmt.Errorf("failed to encode response:%w", err), http.StatusInternalServerError, w)
+		return
 	}
 
 }

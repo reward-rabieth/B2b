@@ -11,17 +11,17 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-        user_id,username,password,email,user_typefk
+        user_id,username,password,email,role_id
 ) VALUES ($1,$2,$3,$4,$5)
-RETURNING user_id, username, password, email, user_typefk, created_at, updated_at
+RETURNING user_id, username, password, email, role_id, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	UserID     string `json:"user_id"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	Email      string `json:"email"`
-	UserTypefk int32  `json:"user_typefk"`
+	UserID   string `json:"user_id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	RoleID   int32  `json:"role_id"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -30,7 +30,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Username,
 		arg.Password,
 		arg.Email,
-		arg.UserTypefk,
+		arg.RoleID,
 	)
 	var i User
 	err := row.Scan(
@@ -38,7 +38,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Username,
 		&i.Password,
 		&i.Email,
-		&i.UserTypefk,
+		&i.RoleID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -56,7 +56,7 @@ func (q *Queries) DeleteUsers(ctx context.Context, userID string) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT user_id, username, password, email, user_typefk, created_at, updated_at FROM users
+SELECT user_id, username, password, email, role_id, created_at, updated_at FROM users
 WHERE email = $1 LIMIT 1
 `
 
@@ -68,7 +68,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Username,
 		&i.Password,
 		&i.Email,
-		&i.UserTypefk,
+		&i.RoleID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -76,7 +76,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT user_id, username, password, email, user_typefk, created_at, updated_at FROM users
+SELECT user_id, username, password, email, role_id, created_at, updated_at FROM users
 WHERE user_id = $1 LIMIT 1
 `
 
@@ -88,50 +88,15 @@ func (q *Queries) GetUserByID(ctx context.Context, userID string) (User, error) 
 		&i.Username,
 		&i.Password,
 		&i.Email,
-		&i.UserTypefk,
+		&i.RoleID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
 	return i, err
 }
 
-const getUserTypeByID = `-- name: GetUserTypeByID :one
-SELECT "user_type" FROM "user_types" WHERE "user_type_pk" = $1
-`
-
-func (q *Queries) GetUserTypeByID(ctx context.Context, userTypePk int32) (NullUserTypeEnum, error) {
-	row := q.db.QueryRow(ctx, getUserTypeByID, userTypePk)
-	var user_type NullUserTypeEnum
-	err := row.Scan(&user_type)
-	return user_type, err
-}
-
-const getUserTypes = `-- name: GetUserTypes :many
-SELECT "user_type_pk", "user_type" FROM "user_types"
-`
-
-func (q *Queries) GetUserTypes(ctx context.Context) ([]UserType, error) {
-	rows, err := q.db.Query(ctx, getUserTypes)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []UserType{}
-	for rows.Next() {
-		var i UserType
-		if err := rows.Scan(&i.UserTypePk, &i.UserType); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const listUsers = `-- name: ListUsers :many
-SELECT user_id, username, password, email, user_typefk, created_at, updated_at FROM users
+SELECT user_id, username, password, email, role_id, created_at, updated_at FROM users
 ORDER BY username
 `
 
@@ -149,7 +114,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 			&i.Username,
 			&i.Password,
 			&i.Email,
-			&i.UserTypefk,
+			&i.RoleID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -168,16 +133,16 @@ UPDATE users
 set username = $2,
     password = $3,
     email= $4,
-    user_typefk=$5
+    role_id=$5
 WHERE user_id = $1
 `
 
 type UpdateUsersParams struct {
-	UserID     string `json:"user_id"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	Email      string `json:"email"`
-	UserTypefk int32  `json:"user_typefk"`
+	UserID   string `json:"user_id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	RoleID   int32  `json:"role_id"`
 }
 
 func (q *Queries) UpdateUsers(ctx context.Context, arg UpdateUsersParams) error {
@@ -186,7 +151,7 @@ func (q *Queries) UpdateUsers(ctx context.Context, arg UpdateUsersParams) error 
 		arg.Username,
 		arg.Password,
 		arg.Email,
-		arg.UserTypefk,
+		arg.RoleID,
 	)
 	return err
 }

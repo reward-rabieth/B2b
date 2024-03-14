@@ -8,6 +8,7 @@ import (
 
 func TestCreatePurchaseRequisitions(t *testing.T) {
 	params := CreatePurchaseRequisitionParams{
+		RequesterID: "reward",
 		Title:       "ujenzi",
 		Description: "vifaaa ",
 	}

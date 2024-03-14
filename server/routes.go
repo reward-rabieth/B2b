@@ -13,6 +13,10 @@ func (app *App) NewHandler() http.Handler {
 	r.HandleFunc("POST /register", app.Register)
 	r.HandleFunc("POST /login", app.Login)
 	r.HandleFunc("POST /api/business", app.AddBusinessParticulars)
+	r.HandleFunc("POST /api/quotation", app.createQuotationRequest)
+	r.HandleFunc("POST /api/supplier", app.createSupplier)
+	r.HandleFunc("/api/procurement/{reqID}", app.UpdatePurchaseRequisitionByID)
+
 	corsHandler := cors.AllowAll()
 	return corsHandler.Handler(r)
 }

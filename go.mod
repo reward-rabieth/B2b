@@ -7,6 +7,7 @@ require (
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.17.0
 	github.com/google/uuid v1.4.0
+	github.com/gorilla/mux v1.7.4
 	github.com/jackc/pgx/v5 v5.5.2
 	github.com/nedpals/supabase-go v0.4.0
 	github.com/rs/cors v1.10.1

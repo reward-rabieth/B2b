@@ -47,15 +47,16 @@ func (c *component) GetAuthContextFromCtx(ctx context.Context) *models.AuthConte
 }
 
 func (c *component) CreateUser(ctx context.Context, email, password, username string, repo users.Store, role string) (interface{}, error) {
-	// Resolve the UserTypePK based on the provided role
-	var userTypePK int
+	// Resolve the userRole
+	//based on the provided role
+	var userRole int
 	switch role {
 	case "procurer":
-		userTypePK = 1
+		userRole = 1
 	case "approver":
-		userTypePK = 2
+		userRole = 2
 	case "supplier":
-		userTypePK = 3
+		userRole = 3
 	default:
 		return nil, errors.New("invalid user role")
 	}
@@ -69,11 +70,11 @@ func (c *component) CreateUser(ctx context.Context, email, password, username st
 	}
 	hashedPassword, _ := util.HashPassword(password)
 	args := users.CreateUserParams{
-		Email:      user.Email,
-		UserID:     user.ID,
-		Password:   hashedPassword,
-		Username:   username,
-		UserTypefk: int32(userTypePK),
+		Email:    user.Email,
+		UserID:   user.ID,
+		Password: hashedPassword,
+		Username: username,
+		RoleID:   int32(userRole),
 	}
 	createUser, err := repo.CreateUser(ctx, args)
 	if err != nil {

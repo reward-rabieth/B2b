@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type UserTypeEnum string
@@ -81,17 +82,40 @@ type PurchaseRequisition struct {
 	DateRejected  time.Time `json:"date_rejected"`
 }
 
-type User struct {
-	UserID     string    `json:"user_id"`
-	Username   string    `json:"username"`
-	Password   string    `json:"password"`
-	Email      string    `json:"email"`
-	UserTypefk int32     `json:"user_typefk"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+type PurchasingAccount struct {
+	AccountName   pgtype.Text `json:"account_name"`
+	AccountNumber int64       `json:"account_number"`
 }
 
-type UserType struct {
-	UserTypePk int32            `json:"user_type_pk"`
-	UserType   NullUserTypeEnum `json:"user_type"`
+type QuotationRequest struct {
+	ProposalRequestID int64     `json:"proposal_request_id"`
+	RequisitionID     uuid.UUID `json:"requisition_id"`
+	SupplierID        uuid.UUID `json:"supplier_id"`
+	Status            string    `json:"status"`
+	DateSubmitted     time.Time `json:"date_submitted"`
+	DateApproved      time.Time `json:"date_approved"`
+	DateRejected      time.Time `json:"date_rejected"`
+}
+
+type Role struct {
+	RoleID   int32        `json:"role_id"`
+	RoleName UserTypeEnum `json:"role_name"`
+}
+
+type Supplier struct {
+	SupplierID    uuid.UUID `json:"supplier_id"`
+	SupplierName  string    `json:"supplier_name"`
+	ContactPerson string    `json:"contact_person"`
+	ContactMail   string    `json:"contact_mail"`
+	SupplierType  string    `json:"supplier_type"`
+}
+
+type User struct {
+	UserID    string    `json:"user_id"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+	Email     string    `json:"email"`
+	RoleID    int32     `json:"role_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

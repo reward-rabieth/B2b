@@ -1,10 +1,10 @@
 
 CREATE TABLE "users" (
-                         "user_id" varchar PRIMARY KEY not null ,
-                         "username" varchar(255) not null ,
+                         "user_id" varchar not null ,
+                         "username" varchar PRIMARY KEY  not null ,
                          "password" varchar(255) not null ,
                          "email" varchar(255) not null ,
-                         "user_typefk" integer not null ,
+                          "role_id" serial not null ,
                          "created_at" timestamptz NOT NULL DEFAULT NOW(),
                          "updated_at" timestamptz not null default (now())
 );
@@ -45,22 +45,28 @@ CREATE TYPE "user_type_enum" AS ENUM (
     'approver',
     'supplier'
     );
+--
+--
+-- CREATE TABLE "user_types" (
+--                               "user_type_pk" integer PRIMARY KEY,
+--                               "user_type" user_type_enum
+-- );
 
-
-CREATE TABLE "user_types" (
-                              "user_type_pk" integer PRIMARY KEY,
-                              "user_type" user_type_enum
+CREATE TABLE "roles"(
+    role_id SERIAL PRIMARY KEY,
+    role_name user_type_enum NOT NULL UNIQUE
 );
 
 
 
 
-ALTER TABLE "purchase_requisitions" ADD FOREIGN KEY ("requester_id") REFERENCES "users" ("user_id");
+
+
+
+ALTER TABLE "purchase_requisitions" ADD FOREIGN KEY ("requester_id") REFERENCES "users" ("username");
 
 ALTER TABLE "quotation_requests" ADD FOREIGN KEY ("requisition_id") REFERENCES "purchase_requisitions" ("requisition_id");
 
 ALTER TABLE "quotation_requests" ADD FOREIGN KEY ("supplier_id") REFERENCES "suppliers" ("supplier_id");
 
-ALTER TABLE  "user_types" ADD CONSTRAINT "user_typefk" UNIQUE ("user_type_pk");
-
-ALTER TABLE "users" ADD FOREIGN KEY ("user_typefk") REFERENCES "user_types" ("user_type_pk");
+ALTER TABLE "users" ADD FOREIGN KEY ("role_id") REFERENCES "roles" ("role_id");

@@ -1,6 +1,6 @@
 -- name: CreateUser :one
 INSERT INTO users (
-        user_id,username,password,email,user_typefk
+        user_id,username,password,email,role_id
 ) VALUES ($1,$2,$3,$4,$5)
 RETURNING *;
 
@@ -12,11 +12,7 @@ WHERE user_id = $1 LIMIT 1;
 SELECT * FROM users
 WHERE email = $1 LIMIT 1;
 
--- name: GetUserTypeByID :one
-SELECT "user_type" FROM "user_types" WHERE "user_type_pk" = $1;
 
--- name: GetUserTypes :many
-SELECT "user_type_pk", "user_type" FROM "user_types";
 
 -- name: ListUsers :many
 SELECT * FROM users
@@ -28,7 +24,7 @@ UPDATE users
 set username = $2,
     password = $3,
     email= $4,
-    user_typefk=$5
+    role_id=$5
 WHERE user_id = $1;
 
 -- name: DeleteUsers :exec

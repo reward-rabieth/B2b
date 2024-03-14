@@ -40,7 +40,7 @@ func (app *App) Register(w http.ResponseWriter, r *http.Request) {
 			// No user found with this email, proceed with registration
 			createdUser, err := app.UserSessionComponent.CreateUser(r.Context(), newUser.Email, newUser.Password, newUser.Username, app.repos, newUser.Role)
 			if err != nil {
-				app.HandleAPIError(fmt.Errorf("failed to ssign up user: %w", err), http.StatusInternalServerError, w)
+				app.HandleAPIError(fmt.Errorf("failed to sign up user: %w", err), http.StatusInternalServerError, w)
 				return
 			}
 

@@ -7,20 +7,18 @@ package users
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 )
 
 const createPurchaseRequisition = `-- name: CreatePurchaseRequisition :one
-INSERT INTO purchase_requisitions (
-    requisition_id,
-    requester_id,
-    description,
-    title,
-    status
-
-) VALUES ($1, $2, $3, $4 ,$5
+INSERT INTO purchase_requisitions(
+requisition_id,
+requester_id,
+description,
+title,
+status
+)VALUES ($1, $2, $3, $4,$5
          ) RETURNING requisition_id, requester_id, description, title, status, date_submitted, date_approved, date_rejected
 `
 
@@ -64,13 +62,13 @@ func (q *Queries) DeletePurchaseRequisition(ctx context.Context, requisitionID u
 	return err
 }
 
-const getPurchaseRequisition = `-- name: GetPurchaseRequisition :one
+const getPurchaseRequisitionByID = `-- name: GetPurchaseRequisitionByID :one
 SELECT requisition_id, requester_id, description, title, status, date_submitted, date_approved, date_rejected FROM purchase_requisitions
 WHERE requisition_id = $1 LIMIT 1
 `
 
-func (q *Queries) GetPurchaseRequisition(ctx context.Context, requisitionID uuid.UUID) (PurchaseRequisition, error) {
-	row := q.db.QueryRow(ctx, getPurchaseRequisition, requisitionID)
+func (q *Queries) GetPurchaseRequisitionByID(ctx context.Context, requisitionID uuid.UUID) (PurchaseRequisition, error) {
+	row := q.db.QueryRow(ctx, getPurchaseRequisitionByID, requisitionID)
 	var i PurchaseRequisition
 	err := row.Scan(
 		&i.RequisitionID,
@@ -121,35 +119,17 @@ func (q *Queries) ListPurchaseRequisitions(ctx context.Context) ([]PurchaseRequi
 
 const updatePurchaseRequisition = `-- name: UpdatePurchaseRequisition :exec
 UPDATE purchase_requisitions
-set requester_id = $2,
-    description = $3,
-    status= $4,
-    date_submitted=$5,
-    date_approved=$6,
-    date_rejected=$7
-
-WHERE requisition_id = $1
+set status= $1
+WHERE requisition_id = $2
+RETURNING requisition_id, requester_id, description, title, status, date_submitted, date_approved, date_rejected
 `
 
 type UpdatePurchaseRequisitionParams struct {
-	RequisitionID uuid.UUID `json:"requisition_id"`
-	RequesterID   string    `json:"requester_id"`
-	Description   string    `json:"description"`
 	Status        string    `json:"status"`
-	DateSubmitted time.Time `json:"date_submitted"`
-	DateApproved  time.Time `json:"date_approved"`
-	DateRejected  time.Time `json:"date_rejected"`
+	RequisitionID uuid.UUID `json:"requisition_id"`
 }
 
 func (q *Queries) UpdatePurchaseRequisition(ctx context.Context, arg UpdatePurchaseRequisitionParams) error {
-	_, err := q.db.Exec(ctx, updatePurchaseRequisition,
-		arg.RequisitionID,
-		arg.RequesterID,
-		arg.Description,
-		arg.Status,
-		arg.DateSubmitted,
-		arg.DateApproved,
-		arg.DateRejected,
-	)
+	_, err := q.db.Exec(ctx, updatePurchaseRequisition, arg.Status, arg.RequisitionID)
 	return err
 }

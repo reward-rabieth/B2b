@@ -13,15 +13,16 @@ import (
 type Querier interface {
 	CreateBusinessParticular(ctx context.Context, arg CreateBusinessParticularParams) (BusinessParticular, error)
 	CreatePurchaseRequisition(ctx context.Context, arg CreatePurchaseRequisitionParams) (PurchaseRequisition, error)
+	CreateQuotationRequest(ctx context.Context, arg CreateQuotationRequestParams) (QuotationRequest, error)
+	CreateSupplier(ctx context.Context, arg CreateSupplierParams) ([]Supplier, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeletePurchaseRequisition(ctx context.Context, requisitionID uuid.UUID) error
 	DeleteUsers(ctx context.Context, userID string) error
-	GetPurchaseRequisition(ctx context.Context, requisitionID uuid.UUID) (PurchaseRequisition, error)
+	GetPurchaseRequisitionByID(ctx context.Context, requisitionID uuid.UUID) (PurchaseRequisition, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, userID string) (User, error)
-	GetUserTypeByID(ctx context.Context, userTypePk int32) (NullUserTypeEnum, error)
-	GetUserTypes(ctx context.Context) ([]UserType, error)
 	ListPurchaseRequisitions(ctx context.Context) ([]PurchaseRequisition, error)
+	ListSupplier(ctx context.Context) ([]Supplier, error)
 	ListUsers(ctx context.Context) ([]User, error)
 	UpdateBusinessParticulars(ctx context.Context, arg UpdateBusinessParticularsParams) error
 	UpdatePurchaseRequisition(ctx context.Context, arg UpdatePurchaseRequisitionParams) error
